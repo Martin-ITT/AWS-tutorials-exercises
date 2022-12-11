@@ -1,0 +1,40 @@
+version: "3.8"
+services:  # what containers we need to run
+  flask-app:    # the name of the secion  
+    image: duopyapp:latest
+    build: ./duotask-pyapp
+    container_name: bob-the-container
+    ports: 
+    - target: 5500
+      protocol: tcp
+      published: 5500
+    environment:
+      YOUR_NAME: "Splat Punchloads"
+  nginx:
+    image: nginx:latest
+#    build: ./duotask-nginx-container
+    ports:
+    - target: 80
+      published: 80
+    volumes: 
+      - type: bind
+        source: ./duotask-nginx-container/nginx.conf
+        target: /etc/nginx/nginx.conf
+    depends_on:
+      - "flask-app"
+  mysql:
+    image: mysql:latest
+    environment: 
+      MYSQL_ROOT_PASSWORD: "password123"
+    ports:
+    - target: 3306
+      published: 3306
+    volumes:
+      - type: volume
+        source: mysql-vol
+        target: /var/lib/mysql
+volumes:
+  nginx-config:
+  mysql-vol:
+networks:
+  duo-net:
